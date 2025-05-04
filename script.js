@@ -258,7 +258,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Intersection Observer for Fade-in Animation
 const observerOptions = {
-    threshold: 0.2
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -273,6 +274,22 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.section-chip, .project-card').forEach(element => {
     element.classList.add('fade-out');
     observer.observe(element);
+});
+
+// Fallback: Ensure .about-section is visible
+setTimeout(() => {
+    const aboutSection = document.querySelector('.about-section .section-chip');
+    if (aboutSection && !aboutSection.classList.contains('fade-in')) {
+        aboutSection.classList.add('fade-in');
+        console.log('Fallback: Forced About section visibility');
+    }
+}, 5000);
+
+// Debug Social Links
+document.querySelectorAll('.port-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        console.log('Clicked link:', link.href);
+    });
 });
 
 // Initialize Skill Bars
@@ -344,4 +361,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }, 1000);
     }
-}); 
+});
