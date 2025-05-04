@@ -1,17 +1,19 @@
 /**
- * Portfolio JavaScript for stabilizing mobile view
- * - Disables custom cursor on mobile
- * - Optimizes particle system and animations
- * - Maintains social links and About section fixes
+ * Portfolio JavaScript for fixing quantum orb click and stabilizing mobile view
+ * - Simplified and robustified quantum orb event handling
+ * - Immediate event binding for reliability
+ * - Enhanced debugging for element and event tracing
+ * - Maintained social links, About section, and mobile stabilization fixes
  * - Assumes provided CSS and prior HTML structure
  */
 
 // Quantum Intro Sequence Controller
 class QuantumIntro {
     constructor() {
-        document.addEventListener('DOMContentLoaded', () => {
-            this.init();
-        });
+        this.initialized = false;
+        this.init();
+        // Bind events immediately in case DOM is already loaded
+        this.bindEvents();
     }
 
     init() {
@@ -20,11 +22,20 @@ class QuantumIntro {
         this.messages = document.querySelector('.quantum-messages');
 
         if (!this.intro || !this.orb || !this.messages) {
-            console.error('Quantum intro elements missing');
+            console.error('Quantum intro elements missing:', {
+                intro: !!this.intro,
+                orb: !!this.orb,
+                messages: !!this.messages
+            });
             return;
         }
 
-        this.initialized = false;
+        // Force orb to be interactable
+        this.orb.style.opacity = '1';
+        this.orb.style.visibility = 'visible';
+        this.orb.style.pointerEvents = 'auto';
+        this.orb.style.zIndex = '10001';
+        this.orb.style.cursor = 'pointer';
 
         // Populate code container
         this.messages.innerHTML = `
@@ -46,50 +57,100 @@ class QuantumIntro {
         this.codeLines = this.messages.querySelectorAll('.code-line');
         this.memeImage = this.messages.querySelector('.meme-image');
 
-        this.bindEvents();
-        this.orb.style.opacity = '1';
-        this.orb.style.visibility = 'visible';
-        console.log('Quantum intro initialized');
-    }
-
-    bindEvents() {
-        // Unified click/touch event handler
-        ['click', 'touchstart'].forEach(event => {
-            this.orb.addEventListener(event, (e) => {
-                e.preventDefault();
-                console.log(`${event} on orb`);
-                if (!this.initialized) {
-                    this.initialized = true;
-                    this.startSequence();
-                }
-            });
+        console.log('Quantum intro initialized, orb interactable:', {
+            position: this.orb.getBoundingClientRect(),
+            display: window.getComputedStyle(this.orb).display
         });
     }
 
-    async startSequence() {
-        console.log('Starting intro sequence');
-
-        this.orb.style.transition = 'all 0.5s ease';
-        this.orb.style.transform = 'scale(1.5)';
-        this.orb.style.opacity = '0';
-        await this.wait(500);
-        this.orb.style.display = 'none';
-
-        this.messages.classList.add('active');
-        await this.wait(300);
-
-        this.memeImage.classList.add('active');
-        await this.wait(500);
-
-        for (let line of this.codeLines) {
-            line.classList.add('active');
-            await this.wait(200);
+    bindEvents() {
+        if (!this.orb) {
+            console.warn('Orb not found for event binding');
+            return;
         }
 
-        await this.wait(4000);
-        this.intro.classList.add('completed');
-        await this.wait(500);
-        this.intro.remove();
+        // Simplified event handling with fallback
+        const handleInteraction = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const eventType = e.type;
+            const coords = eventType === 'touchstart' ? 
+                { x: e.touches[0].clientX, y: e.touches[0].clientY } : 
+                { x: e.clientX, y: e.clientY };
+            console.log(`Quantum orb ${eventType} at (${coords.x}, ${coords.y})`);
+            if (!this.initialized) {
+                this.initialized = true;
+                console.log('Starting quantum intro sequence');
+                this.startSequence();
+            } else {
+                console.log('Sequence already initialized');
+            }
+        };
+
+        // Bind click and touchstart with passive: false
+        ['click', 'touchstart'].forEach(eventType => {
+            this.orb.removeEventListener(eventType, handleInteraction);
+            this.orb.addEventListener(eventType, handleInteraction, { passive: false });
+        });
+
+        // Debug other touch events
+        ['touchend', 'touchmove'].forEach(eventType => {
+            this.orb.addEventListener(eventType, (e) => {
+                console.log(`Quantum orb ${eventType} detected`);
+            });
+        });
+
+        // Fallback: Bind to parent intro element
+        if (this.intro) {
+            this.intro.addEventListener('click', (e) => {
+                if (e.target.closest('.quantum-orb')) {
+                    console.log('Fallback click on quantum-intro triggered orb');
+                    handleInteraction(e);
+                }
+            });
+        }
+    }
+
+    async startSequence() {
+        console.log('Executing intro sequence');
+
+        try {
+            if (!this.orb || !this.messages || !this.intro) {
+                console.error('Elements lost during sequence:', {
+                    orb: !!this.orb,
+                    messages: !!this.messages,
+                    intro: !!this.intro
+                });
+                return;
+            }
+
+            this.orb.style.transition = 'all 0.5s ease';
+            this.orb.style.transform = 'scale(1.5)';
+            this.orb.style.opacity = '0';
+            await this.wait(500);
+            this.orb.style.display = 'none';
+
+            this.messages.classList.add('active');
+            await this.wait(300);
+
+            if (this.memeImage) {
+                this.memeImage.classList.add('active');
+                await this.wait(500);
+            }
+
+            for (let line of this.codeLines) {
+                line.classList.add('active');
+                await this.wait(200);
+            }
+
+            await this.wait(4000);
+            this.intro.classList.add('completed');
+            await this.wait(500);
+            this.intro.remove();
+            console.log('Quantum intro sequence completed');
+        } catch (error) {
+            console.error('Error in intro sequence:', error);
+        }
     }
 
     wait(ms) {
@@ -101,7 +162,8 @@ class QuantumIntro {
 class ParticleSystem {
     constructor() {
         if (window.innerWidth <= 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            return; // Skip on mobile or reduced motion
+            console.log('Skipping particle system on mobile or reduced motion');
+            return;
         }
 
         this.container = document.createElement('div');
@@ -153,7 +215,8 @@ class ParticleSystem {
 class CustomCursor {
     constructor() {
         if (window.innerWidth <= 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            return; // Skip on mobile or reduced motion
+            console.log('Skipping custom cursor on mobile or reduced motion');
+            return;
         }
 
         this.cursor = document.createElement('div');
@@ -391,3 +454,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 });
+
+// Fallback: Reattempt initialization after delay
+setTimeout(() => {
+    const orb = document.querySelector('.quantum-orb');
+    if (orb && window.getComputedStyle(orb).display !== 'none') {
+        console.log('Fallback: Rebinding quantum orb events');
+        const quantumIntro = new QuantumIntro();
+    }
+}, 1000);
