@@ -23,8 +23,8 @@
     --light: #f0f0f0;
     --circuit-color: rgba(0, 255, 157, 0.15);
     --glow: 0 0 10px var(--primary),
-           0 0 20px var(--primary),
-           0 0 30px var(--primary);
+            0 0 20px var(--primary),
+            0 0 30px var(--primary);
     --circuit-width: 2px;
 }
 
@@ -47,6 +47,12 @@ body {
     position: relative;
 }
 
+main {
+    padding-bottom: 100px; /* Account for nav-chip height */
+    position: relative;
+    z-index: 2;
+}
+
 /* Circuit Overlay */
 .circuit-overlay {
     position: fixed;
@@ -56,7 +62,7 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: -1;
-    background: 
+    background:
         linear-gradient(90deg, var(--circuit-color) 1px, transparent 1px) 0 0 / 50px 50px,
         linear-gradient(0deg, var(--circuit-color) 1px, transparent 1px) 0 0 / 50px 50px;
     opacity: 0.5;
@@ -71,7 +77,7 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: -2;
-    background: linear-gradient(0deg, 
+    background: linear-gradient(0deg,
         rgba(0, 255, 157, 0) 0%,
         rgba(0, 255, 157, 0.05) 100%);
     animation: rain 20s linear infinite;
@@ -341,14 +347,21 @@ body {
 
 .social-ports {
     display: flex;
-    gap: 20px;
+    gap: 30px;
     justify-content: center;
     position: relative;
+    z-index: 10;
+}
+
+.port-link-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .port-link {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -357,8 +370,11 @@ body {
     border: 2px solid var(--primary);
     color: var(--primary);
     text-decoration: none;
-    font-size: 24px;
+    font-size: 28px;
     transition: all 0.3s ease;
+    z-index: 11;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .port-link::before {
@@ -374,6 +390,7 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
     animation: rotate 2s linear infinite;
+    pointer-events: none;
 }
 
 .port-link:hover::before {
@@ -382,7 +399,14 @@ body {
 
 /* About Section */
 .about-section {
+    display: block;
+    visibility: visible;
+    opacity: 1;
     padding: 100px 20px;
+    position: relative;
+    z-index: 5;
+    min-height: auto;
+    overflow: visible;
 }
 
 .section-chip {
@@ -403,7 +427,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         linear-gradient(45deg, transparent 48%, var(--primary) 49%, var(--primary) 51%, transparent 52%) 0 0 / 20px 20px,
         linear-gradient(-45deg, transparent 48%, var(--primary) 49%, var(--primary) 51%, transparent 52%) 0 0 / 20px 20px;
     opacity: 0.1;
@@ -464,7 +488,7 @@ body {
 
 .skill-bar {
     height: 15px;
-    background: 
+    background:
         repeating-linear-gradient(
             45deg,
             rgba(255, 255, 255, 0.1) 0px,
@@ -523,7 +547,7 @@ body {
 
 .project-card:hover {
     transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
-    box-shadow: 
+    box-shadow:
         var(--glow),
         -20px 20px 60px rgba(0, 255, 157, 0.1);
 }
@@ -761,6 +785,11 @@ body {
         justify-content: center;
     }
 
+    .hero-section {
+        min-height: 70vh;
+        padding: 60px 15px;
+    }
+
     .hero-content {
         padding: 0 20px;
     }
@@ -769,8 +798,38 @@ body {
         font-size: 36px;
     }
 
+    .about-section {
+        padding: 60px 15px;
+    }
+
     .section-chip {
-        padding: 20px;
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    .about-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .skills-grid, .cert-grid, .interests-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .education-section, .certifications-section, .interests-section {
+        padding: 15px;
+    }
+
+    .social-ports {
+        gap: 25px;
+        padding: 15px 0;
+    }
+
+    .port-link {
+        width: 55px;
+        height: 55px;
+        font-size: 26px;
     }
 
     .footer-content {
@@ -785,17 +844,41 @@ body {
     .avatar-container {
         max-width: 400px;
     }
+
     .avatar {
         max-height: 500px;
     }
 }
 
 @media (max-width: 480px) {
+    .hero-section {
+        min-height: 60vh;
+    }
+
+    .about-section {
+        padding: 40px 10px;
+    }
+
+    .social-ports {
+        gap: 20px;
+    }
+
+    .port-link {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
     .avatar-container {
         max-width: 300px;
     }
+
     .avatar {
         max-height: 400px;
+    }
+
+    .interests-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -866,7 +949,7 @@ body {
 
 .project-card:hover {
     transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
-    box-shadow: 
+    box-shadow:
         var(--glow),
         -20px 20px 60px rgba(0, 255, 157, 0.1);
 }
@@ -887,7 +970,7 @@ body {
 /* Enhanced Skill Bars */
 .skill-bar {
     height: 15px;
-    background: 
+    background:
         repeating-linear-gradient(
             45deg,
             rgba(255, 255, 255, 0.1) 0px,
@@ -945,7 +1028,7 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
+    background:
         radial-gradient(circle at 50% 50%, var(--circuit-color) 1px, transparent 1px) 0 0 / 100px 100px,
         radial-gradient(circle at 0% 0%, var(--circuit-color) 1px, transparent 1px) 0 0 / 50px 50px;
     animation: circuitMove 60s linear infinite;
@@ -957,30 +1040,6 @@ body {
     50% { transform: translateX(50px) translateY(50px); }
     75% { transform: translateX(0) translateY(50px); }
     100% { transform: translateX(0) translateY(0); }
-}
-
-/* Enhanced Social Links */
-.social-ports {
-    position: relative;
-}
-
-.port-link::before {
-    content: '';
-    position: absolute;
-    inset: -5px;
-    border-radius: 50%;
-    background: conic-gradient(
-        from 0deg,
-        transparent 0deg,
-        var(--primary) 360deg
-    );
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    animation: rotate 2s linear infinite;
-}
-
-.port-link:hover::before {
-    opacity: 0.3;
 }
 
 /* Scroll Progress Indicator */
@@ -1127,7 +1186,7 @@ body {
     height: 100px;
     left: 50px;
     top: 50px;
-    background: radial-gradient(circle at 30% 30%, 
+    background: radial-gradient(circle at 30% 30%,
         var(--primary) 0%,
         var(--secondary) 50%,
         #ff00ff 100%
@@ -1139,7 +1198,7 @@ body {
 }
 
 .orb-particles {
-    display: none;  /* Remove the particle background */
+    display: none; /* Remove the particle background */
 }
 
 .orb-ring {
@@ -1715,4 +1774,4 @@ body {
     .interests-grid {
         grid-template-columns: 1fr;
     }
-} 
+}
